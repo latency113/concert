@@ -1,0 +1,103 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+
+const Login = () => {
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("http://localhost:4000/auth/login", {
+        name,
+        password,
+      });
+
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+        Swal.fire({
+          title: "เข้าสู่ระบบ",
+          text: "เข้าสู่ระบบสำเร็จ",
+          icon: "success"
+        });
+      }
+    } catch (err) {
+      setError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+      console.log(err);
+      Swal.fire({
+        title: "เกิดข้อผิดผลาด",
+        text: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
+        icon: "error"
+      });
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-slate-900 to-slate-800">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">
+          เข้าสู่ระบบ
+        </h2>
+
+        {error && (
+          <div className="mb-4 text-red-500 text-sm font-semibold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 font-semibold mb-2"
+              htmlFor="name"
+            >
+              ชื่อผู้ใช้
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label
+              className="block text-gray-700 font-semibold mb-2"
+              htmlFor="password"
+            >
+              รหัสผ่าน
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          >
+            เข้าสู่ระบบ
+          </button>
+        </form>
+        <br />
+        <a href="/register" className="hover:text-blue-400 hover:border-b-2 border-gray-500">ยังไม่ได้เป็นสมาชิก</a>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
