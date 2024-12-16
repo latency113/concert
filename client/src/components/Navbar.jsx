@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"; // Removing useParams
 import axios from "axios";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -54,12 +55,10 @@ const Navbar = () => {
     localStorage.removeItem("userId");
     setUserName("");
     setUserId("");
-    navigate("/login");
-    Swal.fire({
-      title: "ออกจากระบบ",
-      text: "ออกจากระบบสำเร็จ",
-      icon: "success",
-    });
+    toast.success("ออกจากระบบสำเร็จ")
+    setTimeout(() => {
+      navigate("/login");
+    }, 1500);
   };
 
   return (
@@ -94,6 +93,7 @@ const Navbar = () => {
           <li><a href="#">ข่าวสาร</a></li>
         </ul>
       </nav>
+      <ToastContainer />
     </div>
   );
 };

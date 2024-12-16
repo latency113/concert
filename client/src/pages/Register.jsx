@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // useNavigate for redirection
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
   const [name, setName] = useState(""); // ชื่อผู้ใช้
@@ -16,7 +18,7 @@ const Register = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError("รหัสผ่านไม่ตรงกัน");
+      toast.error("รหัสผ่านไม่ตรงกัน!");
       return;
     }
 
@@ -39,10 +41,14 @@ const Register = () => {
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        navigate("/dashboard"); // Redirect after successful registration
+        toast.success("สมัครเป็นสมาชิกสำเร็จ!");
+        setTimeout(()=>{
+           navigate("/login");
+        },500);
+        
       }
     } catch (err) {
-      setError("เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      toast.error("เกิดข้อผิดพลาดในการสมัครเป็นสมาชิก")
     }
   };
 
@@ -131,7 +137,7 @@ const Register = () => {
             สมัครสมาชิก
           </button>
         </form>
-
+          <ToastContainer />
         <br />
         <a href="/login" className="hover:text-blue-400 hover:border-b-2 border-gray-500">เป็นสมาชิกแล้ว</a>
       </div>

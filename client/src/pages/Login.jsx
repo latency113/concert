@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 const Login = () => {
@@ -8,7 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [error, setError] = useState("");
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -20,21 +23,14 @@ const Login = () => {
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        navigate("/");
-        Swal.fire({
-          title: "เข้าสู่ระบบ",
-          text: "เข้าสู่ระบบสำเร็จ",
-          icon: "success"
-        });
+        toast.success("ล็อกอินสำเร็จ!");
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
       }
     } catch (err) {
-      setError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+      toast.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
       console.log(err);
-      Swal.fire({
-        title: "เกิดข้อผิดผลาด",
-        text: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
-        icon: "error"
-      });
     }
   };
 
@@ -90,9 +86,11 @@ const Login = () => {
             type="submit"
             className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600"
           >
+            
             เข้าสู่ระบบ
           </button>
         </form>
+        <ToastContainer />
         <br />
         <a href="/register" className="hover:text-blue-400 hover:border-b-2 border-gray-500">ยังไม่ได้เป็นสมาชิก</a>
       </div>
