@@ -5,13 +5,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
-  const [name, setName] = useState(""); // ชื่อผู้ใช้
+  const [fullName, setFullName] = useState(""); // ชื่อผู้ใช้
   const [email, setEmail] = useState(""); // อีเมล
   const [password, setPassword] = useState(""); // รหัสผ่าน
   const [confirmPassword, setConfirmPassword] = useState(""); // ยืนยันรหัสผ่าน
   const [profile, setProfile] = useState(null); // รูปโปรไฟล์
   const [error, setError] = useState(""); // ข้อความผิดพลาด
-
   const navigate = useNavigate(); // Initialize navigate function
 
   const handleSubmit = async (e) => {
@@ -22,24 +21,9 @@ const Register = () => {
       return;
     }
 
-    const formData = new FormData(); // Create FormData to handle the file upload
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("picture", profile); // Add the profile image
-
     try {
-      const response = await axios.post(
-        "http://localhost:4000/auth/register",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Important for file upload
-          },
-        }
-      );
-
-      if (response.data.token) {
+      const response = await axios.post("http://localhost:4000/auth/register",);
+      if (response.status == 201) {
         localStorage.setItem("token", response.data.token);
         toast.success("สมัครเป็นสมาชิกสำเร็จ!");
         setTimeout(()=>{
@@ -49,6 +33,7 @@ const Register = () => {
       }
     } catch (err) {
       toast.error("เกิดข้อผิดพลาดในการสมัครเป็นสมาชิก")
+      console.log(err)
     }
   };
 
@@ -69,8 +54,8 @@ const Register = () => {
             <input
               type="text"
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
             />

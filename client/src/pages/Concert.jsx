@@ -2,14 +2,14 @@ import React from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
-const Home = () => {
+const Concert = () => {
   return (
     <div>
         <Navbar/>
-      Home
+      Concert
       <Footer/>
     </div>
   )
 }
 
-export default Home
+export default Concert

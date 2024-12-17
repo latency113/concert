@@ -13,29 +13,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id            Int      @id @default(autoincrement())
-  category_id   Int
-  name          String
-  price         Float
-  description   String?
-  unit_in_stock Int
-  picture       String?
-  Category      Category @relation(fields: [category_id], references: [id])
-}
-
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  products Product[]
+enum Role {
+  user
+  admin
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String  @unique
-  email    String?
-  password String?
-  picture  String?
-  role     String? @default("user")
-  enable   Boolean @default(true)
+  id          Int       @id @default(autoincrement())
+  fullName    String
+  email       String    @unique
+  password    String
+  phoneNumber String?
+  picture     String?
+  enabled   Boolean @default(true)
+  role         Role      @default(user)
+  createdAt   DateTime  @default(now())
+  bookings    Booking[]
+}
+
+model Concert {
+  id             Int       @id @default(autoincrement())
+  concertName    String
+  venue          String
+  concertDate    DateTime
+  totalSeats     Int
+  availableSeats Int
+  price          Float
+  createdAt      DateTime  @default(now())
+  bookings       Booking[]
+  seats          Seat[]
+}
+
+model Booking {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  concertId    Int
+  bookingDate  DateTime @default(now())
+  totalTickets Int
+  totalAmount  Float
+  status       String   @default("Pending") // Pending, Confirmed, Cancelled
+  user         User     @relation(fields: [userId], references: [id])
+  concert      Concert  @relation(fields: [concertId], references: [id])
+}
+
+model Seat {
+  id         Int     @id @default(autoincrement())
+  concertId  Int
+  seatNumber String
+  isBooked   Boolean @default(false)
+  concert    Concert @relation(fields: [concertId], references: [id])
 }

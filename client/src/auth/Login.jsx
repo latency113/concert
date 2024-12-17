@@ -7,17 +7,16 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 const Login = () => {
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [error, setError] = useState("");
   
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post("http://localhost:4000/auth/login", {
-        name,
+        email,
         password,
       });
 
@@ -41,12 +40,6 @@ const Login = () => {
           เข้าสู่ระบบ
         </h2>
 
-        {error && (
-          <div className="mb-4 text-red-500 text-sm font-semibold">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -57,9 +50,9 @@ const Login = () => {
             </label>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
             />

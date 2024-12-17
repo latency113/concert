@@ -1,12 +1,11 @@
 const express = require('express');
 const app = express.Router();
-const controller = require('../controllers/user.controller');
-const authenticate = require('../middleware/authenticate'); // Middleware ตรวจสอบ JWT
 
-// ดึงข้อมูลผู้ใช้ทั้งหมด (จำกัดเฉพาะ admin หรือ roles ที่อนุญาต)
-app.get('/', authenticate, controller.get);
+const { get, getProfile } = require('../controllers/user.controller');
 
-// ดึงข้อมูลผู้ใช้ตาม ID
-app.get('/:id', authenticate, controller.getById);
+
+// ใช้ middleware `verifyToken` ในการตรวจสอบ token
+app.get('/', get); // ใช้ middleware ตรวจสอบ token
+app.get('/edit', getProfile); // ใช้ middleware ตรวจสอบ token
 
 module.exports = app;

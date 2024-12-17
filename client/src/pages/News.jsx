@@ -2,14 +2,14 @@ import React from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
-const Home = () => {
+const News = () => {
   return (
     <div>
         <Navbar/>
-      Home
+      News
       <Footer/>
     </div>
   )
 }
 
-export default Home
+export default News

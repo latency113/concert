@@ -43,10 +43,10 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
 
-    const { name, email, password } = req.body;
+    const { fullName, email, password } = req.body;
 
     // Validate inputs
-    if (!name || !email || !password) {
+    if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -67,11 +67,10 @@ exports.register = async (req, res) => {
       // Create user
       const user = await prisma.user.create({
         data: {
-          name,
+          fullName,
           email,
           password: hashPassword,
           picture,
-          enable: true,
         },
       });
 
@@ -85,19 +84,19 @@ exports.register = async (req, res) => {
 
 // Login User
 exports.login = async (req, res) => {
-  const { name, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!name || !password) {
-    return res.status(400).json({ message: "Name and password are required" });
+  if (!email || !password) {
+    return res.status(400).json({ message: "email and password are required" });
   }
 
   try {
     const user = await prisma.user.findUnique({
-      where: { name },
+      where: { email },
     });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid name or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -114,7 +113,7 @@ exports.login = async (req, res) => {
       token,
       user: {
         id: user.id,
-        name: user.name,
+        fullName: user.fullName,
         email: user.email,
       },
     });
