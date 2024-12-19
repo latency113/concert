@@ -9,12 +9,12 @@ app.get('/users', controller.get); // Get all users
 app.get('/user/:id', controller.getById); //Get user by ID  
 app.put('/user/:id', ); //Update user
 app.delete('/user/:id', ); // Delete user  
-app.post('/user/:id', ); // Change user status 
-app.post('/user/:id', ); // Change user role   
-app.post('/user/:id', ); // Add to cart 
-app.get('/user/:id', ); // Get cart   
-app.delete('/user/:id', ); // Clear cart
-app.post('/user/:id', ); // Place an order 
-app.get('/user/:id', ); // Get user orders 
+app.post('/user/change-status', ); // Change user status 
+app.post('/user/change-role', ); // Change user role   
+app.post('/user/cart', ); // Add to cart 
+app.get('/user/cart', ); // Get cart   
+app.delete('/user/cart', ); // Clear cart
+app.post('/user/order', ); // Place an order 
+app.get('/user/order', ); // Get user orders 
 
 module.exports = app;
