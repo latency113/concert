@@ -1,20 +1,15 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 //get port number from environment settings
 require("dotenv").config();
 const port = process.env.PORT || 3000;
 
-
-
-
+// const { readdirSync } = require('fs')
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const productRoute = require("./routes/product.route");
-const customerRoute = require("./routes/customer.route");
-const categorieRoute = require("./routes/category.route");
-const authRoute = require("./routes/auth.route");
-const userRoute = require("./routes/user.route");
 
+app.use(morgan("dev"));
 app.use("/images", express.static("images"));
 app.use(cors());
 app.use(bodyParser.json());
@@ -25,11 +20,21 @@ app.get("/", (req, res) => {
   res.send("สวัสดี");
 });
 
-app.use("/products", productRoute);
-app.use("/customers", customerRoute);
-app.use("/categories", categorieRoute);
-app.use("/auth", authRoute);
-app.use("/users", userRoute);
+const productRoute = require("./routes/product.route");
+const categorieRoute = require("./routes/category.route");
+const authRoute = require("./routes/auth.route");
+const userRoute = require("./routes/user.route");
+const adminRoute = require("./routes/admin.route")
+
+// readdirSync('./src/routes')
+//     .map((c) => app.use('/api', require('./src/routes/' + c)))
+app.use("/api", 
+        productRoute, 
+        categorieRoute, 
+        authRoute, 
+        userRoute,
+        adminRoute
+      );
 
 app.listen(port, () => {
   console.log("App started at port: " + port);
