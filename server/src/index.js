@@ -25,6 +25,7 @@ const categorieRoute = require("./routes/category.route");
 const authRoute = require("./routes/auth.route");
 const userRoute = require("./routes/user.route");
 const adminRoute = require("./routes/admin.route")
+const concertRoute = require("./routes/concert.route")
 
 // readdirSync('./src/routes')
 //     .map((c) => app.use('/api', require('./src/routes/' + c)))
@@ -33,7 +34,8 @@ app.use("/api",
         categorieRoute, 
         authRoute, 
         userRoute,
-        adminRoute
+        adminRoute,
+        concertRoute
       );
 
 app.listen(port, () => {
