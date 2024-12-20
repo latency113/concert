@@ -7,7 +7,7 @@ const controller = require('../controllers/user.controller');
 // ใช้ middleware `verifyToken` ในการตรวจสอบ token
 app.get('/users', controller.get); // Get all users  
 app.get('/user/:id', controller.getById); //Get user by ID  
-app.put('/user/:id', ); //Update user
+app.put('/user/:id', controller.edit); //Update user
 app.delete('/user/:id', ); // Delete user  
 app.post('/user/change-status', ); // Change user status 
 app.post('/user/change-role', ); // Change user role   
