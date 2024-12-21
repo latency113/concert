@@ -33,13 +33,39 @@ const upload = multer({
 });
 
 
+exports.get = async (req,res) => {
+  try {
+    const concert = await prisma.concert.findMany({})
+    res.status(500).json(concert)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message:"error"})
+  }
+}
+
+
+exports.getById = async (req,res) => {
+  try {
+    const {id} = req.params
+    const concert = await prisma.concert.findMany({
+      where : {
+        id:parseInt(id)
+      }
+    })
+    res.status(500).json(concert)
+  } catch (error) {
+    res.status(500).json({message:"error"})
+  }
+}
+
+
 exports.create = async (req, res) => {
   upload.single("picture")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
 
-    const { concertName, venue, concertDate, totalseats ,availableSeats} = req.body;
+    const { concertName, venue, concertDate,price} = req.body;
     const picture = req.file ? req.file.filename : null; // Get filename if uploaded
 
     try {
@@ -49,14 +75,62 @@ exports.create = async (req, res) => {
             concertName:concertName,
             venue:venue,
             concertDate:isoConcertDate,
-            totalSeats:parseInt(totalseats, 10),
-            availableSeats:parseInt(availableSeats, 10),
+            price:parseInt(price),
             picture,
         },
       });
       res.json(concert);
     } catch (error) {
+      console.log(error)
       res.status(500).json({ error: error.message });
     }
   });
 };
+
+
+
+exports.updateCon = async (req, res) => {
+  upload.single("picture")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    const { id } = req.params;
+    const { concertName, venue, concertDate,price} = req.body;
+    const picture = req.file ? req.file.filename : null; // Get filename if uploaded
+
+    try {
+      const isoConcertDate = new Date(concertDate).toISOString();
+      const concert = await prisma.concert.update({
+        where : {
+          id: parseInt(id),
+        },
+        data: {
+            concertName:concertName,
+            venue:venue,
+            concertDate:isoConcertDate,
+            price:parseInt(price),
+            picture,
+        },
+      });
+      res.json(concert);
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ error: error.message });
+    }
+  });
+};
+
+
+exports.delete = async (req,res) => {
+  try {
+    const {id} = req.params
+    const concert = await prisma.concert.delete({
+      where : {
+        id:parseInt(id)
+      }
+    })
+    res.status(500).json(concert)
+  } catch (error) {
+    res.status(500).json({message:"error"})
+  }
+}

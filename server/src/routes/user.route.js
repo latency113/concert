@@ -8,7 +8,7 @@ const controller = require('../controllers/user.controller');
 app.get('/users', controller.get); // Get all users  
 app.get('/user/:id', controller.getById); //Get user by ID  
 app.put('/user/:id', controller.edit); //Update user
-app.delete('/user/:id', ); // Delete user  
+app.delete('/user/:id', controller.delete); // Delete user  
 app.post('/user/change-status', ); // Change user status 
 app.post('/user/change-role', ); // Change user role   
 app.post('/user/cart', ); // Add to cart 

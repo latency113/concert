@@ -84,6 +84,7 @@ exports.update = async (req, res) => {
     const { id } = req.params;
     const { category_id, name, price, description, unit_in_stock } = req.body;
     const picture = req.file ? req.file.filename : null;
+    
     try {
       const product = await prisma.product.update({
         where: {

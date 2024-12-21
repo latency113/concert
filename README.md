@@ -30,6 +30,27 @@
 | `/api/category/:id`                 | PUT    | Update category by ID   | `{ "name": "Updated Name", "description": "Updated description" }` |
 | `/api/category/:id`                 | DELETE | Delete category by ID   | None                        |
 
+## Seat Management
+
+| Endpoint                            | Method | Description            | Body                        |
+|-------------------------------------|--------|------------------------|-----------------------------|
+| `/api/seat/:id`                     | GET    | Get all seat           | None                        |
+| `/api/seat`                         | POST   | Create seat            | `{ "userId": 1, "concertId": 1, "totalTickets": 2, "totalAmount": 200, "status": "Pending" }` |
+| `/api/seat/concert/:id`             | GET    | Get seat by concert    | None                        |
+| `/api/seat/:id`                     | PUT    | Update seat details    | `{ "seatNumber": "A1", "price": 120, "isBooked": true }` |
+| `/api/seat/:id`                     | DELETE | Delete seat by ID      | None                        |
+
+## Booking Management
+
+| Endpoint                            | Method | Description            | Body                        |
+|-------------------------------------|--------|------------------------|-----------------------------|
+| `/api/booking`                     | GET    | Get all booking         | None                        |
+| `/api/booking`                     | POST   | Create booking          | `{ "userId": 1, "concertId": 1, "totalTickets": 2, "totalAmount": 200, "status": "Pending" }` |
+| `/api/booking/user/:id`            | GET    | Get booking by UserID   | None                        |
+| `/api/booking/concert/:id`         | GET    | Get booking by concertID| `{ "name": "Updated Name", "description": "Updated description" }` |
+| `/api/booking/:id`                 | PUT    | Update booking by ID    | `{ "status": "Confirmed" }` |
+| `/api/booking/:id`                 | DELETE | Delete booking by ID    | None                        |
+
 ## Product
 
 | Endpoint                            | Method | Description            | Body                                                                                  |

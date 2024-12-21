@@ -32,15 +32,15 @@ model User {
 }
 
 model Concert {
-  id             Int       @id @default(autoincrement())
-  concertName    String
-  venue          String
-  concertDate    DateTime
-  totalSeats     Int
-  availableSeats Int
-  createdAt      DateTime  @default(now())
-  bookings       Booking[]
-  seats          Seat[]
+  id          Int       @id @default(autoincrement())
+  concertName String
+  venue       String
+  concertDate DateTime?
+  picture     String?
+  price       Int
+  createdAt   DateTime  @default(now())
+  bookings    Booking[]
+  seats       Seat[]
 }
 
 model Category {
@@ -56,7 +56,7 @@ model Product {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  price       Float
+  price       Int
   stock       Int      @default(0)
   categoryId  Int
   createdAt   DateTime @default(now())
