@@ -6,6 +6,7 @@ const controller = require('../controllers/product.controller')
 
 
 //localhost:4000/products
+app.get('/product', controller.get)
 app.post('/product', controller.create)
 app.get('/product/:id', controller.getById)
 app.put('/product/:id', controller.update)

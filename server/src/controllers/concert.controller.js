@@ -66,7 +66,7 @@ exports.create = async (req, res) => {
     }
 
     const { concertName, venue, concertDate,price} = req.body;
-    const picture = req.file ? req.file.filename : null; // Get filename if uploaded
+    const picture = req.file ? req.file.filename : null;
 
     try {
         const isoConcertDate = new Date(concertDate).toISOString();
@@ -79,9 +79,9 @@ exports.create = async (req, res) => {
             picture,
         },
       });
-      res.json(concert);
+      res.json({message: "สร้างคอนเสิร์ตสำเร็จ",concert,});
     } catch (error) {
-      console.log(error)
+      console.error("เกิดข้อผิดพลาดระหว่างการอัปเดตคอนเสิร์ต:", error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -112,9 +112,9 @@ exports.updateCon = async (req, res) => {
             picture,
         },
       });
-      res.json(concert);
+      res.json({message: "อัพเดตคอนเสิร์ตสำเร็จ",concert,});
     } catch (error) {
-      console.log(error)
+      console.error("เกิดข้อผิดพลาดระหว่างการอัพเดตคอนเสิร์ต:", error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -129,8 +129,48 @@ exports.delete = async (req,res) => {
         id:parseInt(id)
       }
     })
-    res.status(500).json(concert)
+    res.json({message: "ลบคอนเสิร์ตสำเร็จ",concert,});
   } catch (error) {
-    res.status(500).json({message:"error"})
+    console.error("เกิดข้อผิดพลาดระหว่างการลบคอนเสิร์ต:", error);
+    res.status(500).json({ error: error.message });
   }
 }
+
+
+exports.getBookings = async (req, res) => {
+  try {
+    const { id } = req.params; 
+
+    const bookings = await prisma.booking.findMany({
+      where: {
+        concertId: parseInt(id),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+        concert: {
+          select: {
+            id: true,
+            concertName: true,
+            concertDate: true,
+            venue: true,
+          },
+        },
+      },
+    });
+
+    if (bookings.length === 0) {
+      return res.status(404).json({ message: "No bookings found for this concert." });
+    }
+
+    res.json({message: "จองคอนเสิร์ตสำเร็จ",bookings,});
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดระหว่างการจองคอนเสิร์ต:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

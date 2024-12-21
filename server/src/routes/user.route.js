@@ -1,20 +1,18 @@
 const express = require('express');
 const app = express.Router();
-
 const controller = require('../controllers/user.controller');
 
 
-// ใช้ middleware `verifyToken` ในการตรวจสอบ token
-app.get('/users', controller.get); // Get all users  
-app.get('/user/:id', controller.getById); //Get user by ID  
-app.put('/user/:id', controller.edit); //Update user
-app.delete('/user/:id', controller.delete); // Delete user  
-app.post('/user/change-status', ); // Change user status 
-app.post('/user/change-role', ); // Change user role   
-app.post('/user/cart', ); // Add to cart 
-app.get('/user/cart', ); // Get cart   
-app.delete('/user/cart', ); // Clear cart
-app.post('/user/order', ); // Place an order 
-app.get('/user/order', ); // Get user orders 
+app.get("/users", controller.getAllUsers);
+app.get("/user/:id", controller.getUserById);
+app.put("/user/:id", controller.updateUser);
+app.delete("/user/:id", controller.deleteUser);
+app.post("/change-status", controller.changeUserStatus);
+app.post("/change-role", controller.changeUserRole);
+app.post("/user/cart", controller.addToCart);
+app.get("/user/cart", controller.getCart);
+app.delete("/user/cart", controller.clearCart);
+app.post("/user/order", controller.placeOrder);
+app.get("/user/order", controller.getUserOrders);
 
 module.exports = app;

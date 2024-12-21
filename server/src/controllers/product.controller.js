@@ -4,107 +4,100 @@ const multer = require("multer");
 
 exports.get = async (req, res) => {
   try {
-      const products = await prisma.product.findMany({
-    include: {
-      Category: true,
-    },
-  });
-  // Add image URL to each product
-  const productsWithUrls = products.map((product) => ({
-    ...product,
-    pictureUrl: product.picture
-      ? `${req.protocol}://${req.get("host")}/images/${product.picture}`
-      : null,
-  }));
-  res.json(productsWithUrls);
+    const products = await prisma.product.findMany({
+      include: {
+        category: true,
+      },
+    });
+    res.json(products);
   } catch (error) {
-    res.json("error")
+    res.json(error);
+    console.log(error)
   }
-
 };
 
 exports.getById = async (req, res) => {
   try {
-      const { id } = req.params;
-  const product = await prisma.product.findUnique({
-    where: {
-      id: parseInt(id),
-    },
-    include: {
-      Category: true,
-    },
-  });
-  // Add image URL to the product
-  if (product) {
-    product.pictureUrl = product.picture
-      ? `${req.protocol}://${req.get("host")}/images/${product.picture}`
-      : null;
-  }
-  res.json(product);
+    const { id } = req.params;
+    const product = await prisma.product.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        category: true,
+      },
+    });
+    res.json(product);
   } catch (error) {
-    res.json("error")
+    res.json("error");
   }
-
 };
 
 exports.create = async (req, res) => {
-  // Use upload.single middleware to handle file upload
-  upload.single('picture')(req, res, async (err) => { 
+  upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
 
-    const { category_id, name, price, description, unit_in_stock } = req.body;
-    const picture = req.file ? req.file.filename : null; // Get filename if uploaded
+    const { categoryId, name, price, description, stock } = req.body;
+    const image = req.file ? req.file.filename : null;
 
     try {
       const product = await prisma.product.create({
         data: {
-          category_id: parseInt(category_id),
+          categoryId: parseInt(categoryId),
           name,
-          price: parseFloat(price),
+          price: parseInt(price),
           description,
-          unit_in_stock: parseInt(unit_in_stock),
-          picture, // Store filename in the database
+          stock: parseInt(stock),
+          image,
         },
       });
-      res.json(product);
+      res.json({message: "สร้างสินค้าสำเร็จ",product,});
     } catch (error) {
+      console.error("เกิดข้อผิดพลาดระหว่างการสร้างสินค้า:", error);
       res.status(500).json({ error: error.message });
     }
   });
 };
 
-
 exports.update = async (req, res) => {
-  upload.single("picture")(req, res, async (err) => {
+  upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
     const { id } = req.params;
-    const { category_id, name, price, description, unit_in_stock } = req.body;
-    const picture = req.file ? req.file.filename : null;
-    
+    const { categoryId, name, price, description, stock } = req.body;
+    const image = req.file ? req.file.filename : null;
+
     try {
+      const data = {};
+      if (categoryId) data.categoryId = parseInt(categoryId);
+      if (name) data.name = name;
+      if (price) data.price = parseFloat(price);
+      if (description) data.description = description;
+      if (stock) data.stock = parseInt(stock);
+      if (image) data.image = image;
+
+      if (Object.keys(data).length === 0) {
+        return res.status(400).json({ message: "กรุณาระบุฟิลด์ที่ต้องการอัปเดตอย่างน้อย 1 ฟิลด์" });
+      }
+
       const product = await prisma.product.update({
-        where: {
-          id: parseInt(id),
+        where: { 
+          id: parseInt(id) 
         },
-        data: {
-          category_id: parseInt(category_id),
-          name,
-          price: parseFloat(price),
-          description,
-          unit_in_stock: parseInt(unit_in_stock),
-          picture, // Update filename if a new file is uploaded
-        },
+        data,
       });
-      res.json(product);
+
+      res.json({message: "อัปเดตสินค้าสำเร็จ",product,});
     } catch (error) {
+      console.error("เกิดข้อผิดพลาดระหว่างการอัปเดตสินค้า:", error);
       res.status(500).json({ error: error.message });
     }
   });
 };
+
 
 exports.delete = async (req, res) => {
   try {
@@ -194,10 +187,9 @@ exports.stock = async (req, res) => {
   res.json(stockk);
 };
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "images/"); // Store files in the 'images' directory
+    cb(null, "images/");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);

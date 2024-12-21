@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-// Multer Storage Configuration
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "images/photo/");
@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// Multer Middleware
+
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
@@ -36,7 +36,7 @@ const upload = multer({
   },
 });
 
-// Register User
+
 exports.register = async (req, res) => {
   upload.single("picture")(req, res, async (err) => {
     if (err) {
@@ -45,13 +45,13 @@ exports.register = async (req, res) => {
 
     const { fullName, email, password } = req.body;
 
-    // Validate inputs
+
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-      // Check if user already exists
+
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -60,11 +60,11 @@ exports.register = async (req, res) => {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      // Hash password
+
       const hashPassword = await bcrypt.hash(password, 10);
       const picture = req.file ? req.file.filename : null;
 
-      // Create user
+
       const user = await prisma.user.create({
         data: {
           fullName,
@@ -82,7 +82,7 @@ exports.register = async (req, res) => {
   });
 };
 
-// Login User
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
