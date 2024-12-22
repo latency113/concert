@@ -1,6 +1,6 @@
 # API Endpoints Summary
 
-## Authentication
+## Authentication Clear
 
 | Endpoint                            | Method | Description        | Body                                                 |
 |-------------------------------------|--------|--------------------|------------------------------------------------------|
@@ -9,7 +9,7 @@
 | `/api/current-user`                 | GET    | Get current user   | None                                                 |
 | `/api/current-admin`                | GET    | Get current admin  | None                                                 |
 
-## Concert Management
+## Concert Management Clear
 
 | Endpoint                            | Method | Description                | Body                                                                                  |
 |-------------------------------------|--------|----------------------------|---------------------------------------------------------------------------------------|
@@ -20,7 +20,7 @@
 | `/api/concert/:id`                  | DELETE | Delete concert by ID       | None                                                                                  |
 | `/api/concert/:id/bookings`         | GET    | Get bookings for concert   | None                                                                                  |
 
-## Category
+## Category Clear
 
 | Endpoint                            | Method | Description            | Body                        |
 |-------------------------------------|--------|------------------------|-----------------------------|
@@ -51,7 +51,7 @@
 | `/api/booking/:id`                 | PUT    | Update booking by ID    | `{ "status": "Confirmed" }` |
 | `/api/booking/:id`                 | DELETE | Delete booking by ID    | None                        |
 
-## Product
+## Product 
 
 | Endpoint                            | Method | Description            | Body                                                                                  |
 |-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
@@ -62,7 +62,7 @@
 | `/api/productby`                    | POST   | Get products by filters | `{ "sort": "price", "order": "asc", "limit": 2 }` or `{ "sort": "stock", "order": "desc", "limit": 2 }` |
 | `/api/search/filters`               | POST   | Search with filters     | `{ "query": "polycat" }`, `{ "price": [500, 1000] }`, or `{ "category": [1, 2] }`        |
 
-## User Management
+## User Management Clear
 
 | Endpoint                            | Method | Description               | Body                                                       |
 |-------------------------------------|--------|---------------------------|------------------------------------------------------------|
