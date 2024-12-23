@@ -51,7 +51,7 @@
 | `/api/booking/:id`                 | PUT    | Update booking by ID    | `{ "status": "Confirmed" }` |
 | `/api/booking/:id`                 | DELETE | Delete booking by ID    | None                        |
 
-## Product 
+## Product Clear
 
 | Endpoint                            | Method | Description            | Body                                                                                  |
 |-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
