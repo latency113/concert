@@ -17,31 +17,31 @@ exports.authMiddleware = (req, res, next) => {
   }
 };
 
-// 📌 1. GET /api/users - Fetch all users
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany();
-    res.status(200).json(users);
+    res.json({ message: "สำเร็จ", users });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching users" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 2. GET /api/user/:id - Fetch user by ID
+
 exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await prisma.user.findUnique({ where: { id: parseInt(id) } });
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.status(200).json(user);
+    res.json({ message: "สำเร็จ", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching user by ID" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 3. PUT /api/user/:id - Update user
+
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -52,26 +52,25 @@ exports.updateUser = async (req, res) => {
       where: { id: parseInt(id) },
       data: updateData,
     });
-    res.status(200).json(user);
+    res.json({ message: "สำเร็จ", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error updating user" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 4. DELETE /api/user/:id - Delete user
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
     await prisma.user.delete({ where: { id: parseInt(id) } });
-    res.status(200).json({ message: "User deleted successfully" });
+    res.json({ message: "สำเร็จ", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error deleting user" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 5. POST /api/change-status - Change user status
+
 exports.changeUserStatus = async (req, res) => {
   try {
     const { id, enabled } = req.body;
@@ -79,14 +78,14 @@ exports.changeUserStatus = async (req, res) => {
       where: { id: parseInt(id) },
       data: { enabled },
     });
-    res.status(200).json(user);
+    res.json({ message: "สำเร็จ", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error changing user status" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 6. POST /api/change-role - Change user role
+
 exports.changeUserRole = async (req, res) => {
   try {
     const { id, role } = req.body;
@@ -97,14 +96,14 @@ exports.changeUserRole = async (req, res) => {
       where: { id: parseInt(id) },
       data: { role },
     });
-    res.status(200).json(user);
+    res.json({ message: "สำเร็จ", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error changing user role" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 7. POST /api/user/cart - Add to cart
+
 exports.addToCart = async (req, res) => {
   try {
     const { cart } = req.body;
@@ -116,14 +115,13 @@ exports.addToCart = async (req, res) => {
       price: item.price,
     }));
     await prisma.cart.createMany({ data: cartData });
-    res.status(200).json({ message: "Items added to cart" });
+    res.json({ message: "สำเร็จ", user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error adding to cart" });
+    console.error("เกิดข้อผิดพลาด:", cartData);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 8. GET /api/user/cart - Get cart
 exports.getCart = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -131,26 +129,26 @@ exports.getCart = async (req, res) => {
       where: { userId },
       include: { product: true },
     });
-    res.status(200).json(cart);
+    res.json({ message: "สำเร็จ", cart });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching cart" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 9. DELETE /api/user/cart - Clear cart
+
 exports.clearCart = async (req, res) => {
   try {
     const userId = req.user.id;
     await prisma.cart.deleteMany({ where: { userId } });
-    res.status(200).json({ message: "Cart cleared" });
+    res.json({ message: "สำเร็จ", userId });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error clearing cart" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 10. POST /api/user/order - Place order
+
 exports.placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -169,14 +167,14 @@ exports.placeOrder = async (req, res) => {
       include: { items: true },
     });
     await prisma.cart.deleteMany({ where: { userId } });
-    res.status(200).json(order);
+    res.json({ message: "สำเร็จ", order });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error placing order" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// 📌 11. GET /api/user/order - Get orders
+
 exports.getUserOrders = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -184,9 +182,9 @@ exports.getUserOrders = async (req, res) => {
       where: { userId },
       include: { items: true },
     });
-    res.status(200).json(orders);
+    res.json({ message: "สำเร็จ", orders });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching orders" });
+    console.error("เกิดข้อผิดพลาด:", error);
+    res.status(500).json({ error: error.message });
   }
 };

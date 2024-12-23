@@ -107,9 +107,10 @@ exports.delete = async (req, res) => {
         id: parseInt(id),
       },
     });
-    res.json(product);
+    res.json({message: "ลบสินค้าสำเร็จ",product,});
   } catch (error) {
-    res.json(error);
+    console.error("เกิดข้อผิดพลาดระหว่างการลบสินค้า:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -119,7 +120,7 @@ exports.orderBy = async (req, res) => {
     const product = await prisma.product.findMany({
       take: limit,
       orderBy: { [sort]: order },
-      include: { Category: true },
+      include: { category: true },
     });
     res.json(product);
   } catch (error) {
@@ -130,6 +131,7 @@ exports.orderBy = async (req, res) => {
 exports.filter = async (req, res) => {
   try {
     const { query, category, price } = req.body;
+
     if (query) {
       const products = await prisma.product.findMany({
         where: {
@@ -138,54 +140,45 @@ exports.filter = async (req, res) => {
           },
         },
         include: {
-          Category: true,
+          category: true,
         },
       });
-      res.json(products);
+      res.json({message:"success",products});
     }
     if (category) {
       const products = await prisma.product.findMany({
         where: {
-          category_id: {
+          categoryId: {
             in: category.map((id) => Number(id)),
           },
         },
         include: {
-          Category: true,
+          category: true,
         },
       });
-      res.json(products);
+      res.json({message:"success",products});
     }
     if (price) {
       const products = await prisma.product.findMany({
         where: {
           price: {
-            gte: price[0],
-            lte: price[1],
+            gte: price,
+            lte: price
           },
         },
         include: {
-          Category: true,
+          category: true,
         },
       });
-      res.json(products);
+      res.json({message:"success",products});
     }
+
+
   } catch (error) {
     res.json("Server Error");
   }
 };
 
-exports.stock = async (req, res) => {
-  const { stock } = req.params;
-  const stockk = await prisma.product.findMany({
-    where: {
-      unit_in_stock: {
-        lte: parseInt(stock),
-      },
-    },
-  });
-  res.json(stockk);
-};
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
