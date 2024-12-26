@@ -130,7 +130,7 @@ exports.orderBy = async (req, res) => {
 
 exports.filter = async (req, res) => {
   try {
-    const { query, category, price } = req.body;
+    const { query, price } = req.body;
 
     if (query) {
       const products = await prisma.product.findMany({
@@ -145,25 +145,13 @@ exports.filter = async (req, res) => {
       });
       res.json({message:"success",products});
     }
-    if (category) {
-      const products = await prisma.product.findMany({
-        where: {
-          categoryId: {
-            in: category.map((id) => Number(id)),
-          },
-        },
-        include: {
-          category: true,
-        },
-      });
-      res.json({message:"success",products});
-    }
+
     if (price) {
       const products = await prisma.product.findMany({
         where: {
           price: {
-            gte: price,
-            lte: price
+            // gte: price,
+            gte: price
           },
         },
         include: {
@@ -172,7 +160,6 @@ exports.filter = async (req, res) => {
       });
       res.json({message:"success",products});
     }
-
 
   } catch (error) {
     res.json("Server Error");

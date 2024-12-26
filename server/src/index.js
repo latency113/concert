@@ -26,6 +26,9 @@ const authRoute = require("./routes/auth.route");
 const userRoute = require("./routes/user.route");
 const adminRoute = require("./routes/admin.route")
 const concertRoute = require("./routes/concert.route")
+const bookingRoute = require("./routes/booking.route")
+const orderRoute = require("./routes/order.route")
+const cartRoute = require("./routes/cart.route")
 
 // readdirSync('./src/routes')
 //     .map((c) => app.use('/api', require('./src/routes/' + c)))
@@ -35,7 +38,10 @@ app.use("/api",
         authRoute, 
         userRoute,
         adminRoute,
-        concertRoute
+        concertRoute,
+        bookingRoute,
+        orderRoute,
+        cartRoute,
       );
 
 app.listen(port, () => {

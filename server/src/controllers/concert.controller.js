@@ -69,14 +69,15 @@ exports.create = async (req, res) => {
     const picture = req.file ? req.file.filename : null;
 
     try {
-        const isoConcertDate = new Date(concertDate).toISOString();
+      const isoConcertDate = new Date(concertDate).toISOString();
       const concert = await prisma.concert.create({
         data: {
-            concertName:concertName,
-            venue:venue,
-            concertDate:isoConcertDate,
-            price:parseInt(price),
-            picture,
+          concertName,
+          venue,
+          concertDate: isoConcertDate,
+          price: parseInt(price),
+          seatsAvailable: parseInt(seatsAvailable), // ระบุจำนวนที่นั่งที่ขายได้
+          picture,
         },
       });
       res.json({message: "สร้างคอนเสิร์ตสำเร็จ",concert,});
@@ -95,11 +96,10 @@ exports.updateCon = async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
     const { id } = req.params;
-    const { concertName, venue, concertDate,price} = req.body;
+    const { concertName, venue, concertDate,price,seatsAvailable} = req.body;
     const picture = req.file ? req.file.filename : null; // Get filename if uploaded
 
     try {
-      const isoConcertDate = new Date(concertDate).toISOString();
       const concert = await prisma.concert.update({
         where : {
           id: parseInt(id),
@@ -107,7 +107,8 @@ exports.updateCon = async (req, res) => {
         data: {
             concertName:concertName,
             venue:venue,
-            concertDate:isoConcertDate,
+            concertDate:concertDate,
+            seatsAvailable: parseInt(seatsAvailable), // ระบุจำนวนที่นั่งที่ขายได้
             price:parseInt(price),
             picture,
         },
