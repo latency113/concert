@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "images/photo/");
@@ -14,15 +13,18 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(
       null,
-      file.fieldname + "-" + uniqueSuffix + "." + file.originalname.split(".").pop()
+      file.fieldname +
+        "-" +
+        uniqueSuffix +
+        "." +
+        file.originalname.split(".").pop()
     );
   },
 });
 
-
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const fileTypes = /jpeg|jpg|png/;
     const extName = fileTypes.test(file.originalname.toLowerCase());
@@ -36,34 +38,31 @@ const upload = multer({
   },
 });
 
-
 exports.register = async (req, res) => {
-  upload.single("picture")(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ error: err.message });
-    }
+  try {
+    upload.single("picture")(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
 
-    const { fullName, email, password } = req.body;
+      const { fullName, email, password } = req.body;
 
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
 
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    try {
-
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
+      const existingUser = await prisma.user.findFirst({
+        where: { 
+          email 
+        },
       });
 
       if (existingUser) {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-
-      const hashPassword = await bcrypt.hash(password, 10);
+      const hashPassword = await bcrypt.hash(password, 20);
       const picture = req.file ? req.file.filename : null;
-
 
       const user = await prisma.user.create({
         data: {
@@ -75,24 +74,27 @@ exports.register = async (req, res) => {
       });
 
       res.status(201).json({ message: "User registered successfully", user });
-    } catch (error) {
-      console.error("Error registering user:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
+    });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "email and password are required" });
-  }
-
   try {
-    const user = await prisma.user.findUnique({
-      where: { email },
+    const { email, password } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "email are required" });
+    }
+    if (!password) {
+      return res.status(400).json({ message: "password are required" });
+    }
+    const user = await prisma.user.findFirst({
+      where: { 
+        email 
+      },
     });
 
     if (!user) {
@@ -101,7 +103,7 @@ exports.login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid name or password" });
+      return res.status(401).json(isMatch);
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
@@ -122,3 +124,21 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.currentUser = async (req, res) => {
+  try {
+      const user = await prisma.user.findFirst({
+          where: { email: req.user.email },
+          select: {
+              id: true,
+              email: true,
+              fullNameame: true,
+              role: true
+          }
+      })
+      res.json({ user })
+  } catch (error) {
+      console.log(error)
+      res.status(500).json({ message: 'Server Error' })
+  }
+}

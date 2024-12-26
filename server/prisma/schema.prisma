@@ -19,9 +19,9 @@ model Concert {
   concertDate    DateTime?
   picture        String?
   price          Int
-  seatsAvailable Int       @default(0) // จำนวนที่นั่งที่สามารถขายได้
+  seatsAvailable Int       @default(0)
   createdAt      DateTime  @default(now())
-  bookings       Booking[] // รายการจองบัตร
+  bookings       Booking[]
 }
 
 model Booking {
@@ -29,9 +29,9 @@ model Booking {
   userId       Int
   concertId    Int
   bookingDate  DateTime @default(now())
-  totalTickets Int // จำนวนบัตรที่ถูกจอง
-  totalAmount  Float // ยอดรวม
-  status       String   @default("Pending") // สถานะการจอง
+  totalTickets Int
+  totalAmount  Float
+  status       String   @default("Pending")
   user         User     @relation(fields: [userId], references: [id])
   concert      Concert  @relation(fields: [concertId], references: [id])
 }

@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
 
 // Middleware for Auth
 exports.authMiddleware = (req, res, next) => {
@@ -17,6 +18,39 @@ exports.authMiddleware = (req, res, next) => {
   }
 };
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "images/photo/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname +
+        "-" +
+        uniqueSuffix +
+        "." +
+        file.originalname.split(".").pop()
+    );
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png/;
+    const extName = fileTypes.test(file.originalname.toLowerCase());
+    const mimeType = fileTypes.test(file.mimetype);
+
+    if (extName && mimeType) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only .jpeg, .jpg, .png files are allowed!"));
+    }
+  },
+});
+
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -27,7 +61,6 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.getUserById = async (req, res) => {
   try {
@@ -41,18 +74,26 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-
 exports.updateUser = async (req, res) => {
   try {
+    upload.single("picture")(req, res, async (err) => {
     const { id } = req.params;
-    const { fullName, email, phoneNumber, password } = req.body;
-    const updateData = { fullName, email, phoneNumber };
+    const { fullName, email, phoneNumber, password} = req.body;
     if (password) updateData.password = await bcrypt.hash(password, 10);
+    const picture = req.file ? req.file.filename : null;
     const user = await prisma.user.update({
-      where: { id: parseInt(id) },
-      data: updateData,
+      where: { 
+        id: parseInt(id) 
+      },
+      data: {
+        fullName, 
+        email, 
+        phoneNumber,
+        picture
+      }
     });
     res.json({ message: "สำเร็จ", user });
+  });
   } catch (error) {
     console.error("เกิดข้อผิดพลาด:", error);
     res.status(500).json({ error: error.message });
@@ -62,14 +103,17 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.user.delete({ where: { id: parseInt(id) } });
+    const user = await prisma.user.delete({ 
+      where: { 
+        id: parseInt(id) 
+      }
+    });
     res.json({ message: "สำเร็จ", user });
   } catch (error) {
     console.error("เกิดข้อผิดพลาด:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.changeUserStatus = async (req, res) => {
   try {
@@ -84,7 +128,6 @@ exports.changeUserStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.changeUserRole = async (req, res) => {
   try {
@@ -102,7 +145,6 @@ exports.changeUserRole = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.addToCart = async (req, res) => {
   try {
@@ -136,7 +178,6 @@ exports.getCart = async (req, res) => {
   }
 };
 
-
 exports.clearCart = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -147,7 +188,6 @@ exports.clearCart = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.placeOrder = async (req, res) => {
   try {
@@ -173,7 +213,6 @@ exports.placeOrder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.getUserOrders = async (req, res) => {
   try {
