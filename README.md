@@ -34,7 +34,7 @@
 
 | Endpoint                            | Method | Description            | Body                        |
 |-------------------------------------|--------|------------------------|-----------------------------|
-| `/api/seat/:id`                     | GET    | Get all seat           | None                        |
+| `/api/seat`                         | GET    | Get all seat           | None                        |
 | `/api/seat`                         | POST   | Create seat            | `{ "userId": 1, "concertId": 1, "totalTickets": 2, "totalAmount": 200, "status": "Pending" }` |
 | `/api/seat/concert/:id`             | GET    | Get seat by concert    | None                        |
 | `/api/seat/:id`                     | PUT    | Update seat details    | `{ "seatNumber": "A1", "price": 120, "isBooked": true }` |
