@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express.Router();
 const controller = require('../controllers/user.controller');
-
+const { authCheck, adminCheck } = require('../middlewares/middleware')
 
 app.get("/users", controller.getAllUsers);
-app.get("/user/:id", controller.getUserById);
-app.put("/user/:id", controller.updateUser);
+app.get("/user/profile", authCheck,controller.getProfile);
+app.put("/user/:id", authCheck,controller.updateProfile);
 app.delete("/user/:id", controller.deleteUser);
 app.post("/change-status", controller.changeUserStatus);
 app.post("/change-role", controller.changeUserRole);

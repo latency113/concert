@@ -65,7 +65,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
 
-    const { concertName, venue, concertDate,price} = req.body;
+    const { concertName, venue, concertDate,price,seatsAvailable} = req.body;
     const picture = req.file ? req.file.filename : null;
 
     try {
@@ -76,7 +76,7 @@ exports.create = async (req, res) => {
           venue,
           concertDate: isoConcertDate,
           price: parseInt(price),
-          seatsAvailable: parseInt(seatsAvailable), // ระบุจำนวนที่นั่งที่ขายได้
+          seatsAvailable: parseInt(seatsAvailable),
           picture,
         },
       });
@@ -97,7 +97,7 @@ exports.updateCon = async (req, res) => {
     }
     const { id } = req.params;
     const { concertName, venue, concertDate,price,seatsAvailable} = req.body;
-    const picture = req.file ? req.file.filename : null; // Get filename if uploaded
+    const picture = req.file ? req.file.filename : null;
 
     try {
       const concert = await prisma.concert.update({
@@ -108,8 +108,8 @@ exports.updateCon = async (req, res) => {
             concertName:concertName,
             venue:venue,
             concertDate:concertDate,
-            seatsAvailable: parseInt(seatsAvailable), // ระบุจำนวนที่นั่งที่ขายได้
-            price:parseInt(price),
+            seatsAvailable:seatsAvailable,
+            price:price,
             picture,
         },
       });

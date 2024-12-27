@@ -20,7 +20,7 @@ exports.authMiddleware = (req, res, next) => {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "images/photo/");
+    cb(null, "public/photo/");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -51,7 +51,6 @@ const upload = multer({
   },
 });
 
-
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany();
@@ -62,38 +61,66 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-exports.getUserById = async (req, res) => {
+exports.getProfile = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { id: parseInt(id) } });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ message: "สำเร็จ", user });
+    console.log("req.user:", req.user);
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized: User ID is missing" });
+    }
+
+    const userId = req.user.id;
+    console.log("User ID:", userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        email: true,
+        phoneNumber: true,
+        picture: true,
+      },
+    });
+
+    const usersWithUrls ={
+      ...user,
+      pictureUrl: user.picture ? `${req.protocol}://${req.get('host')}/images/photo/${user.picture}` : null
+    };
+
+    if (!user) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
+
+    res.status(200).json({ message: "Profile retrieved successfully", user: usersWithUrls });
   } catch (error) {
-    console.error("เกิดข้อผิดพลาด:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error retrieving profile:", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-exports.updateUser = async (req, res) => {
+
+exports.updateProfile = async (req, res) => {
   try {
     upload.single("picture")(req, res, async (err) => {
-    const { id } = req.params;
-    const { fullName, email, phoneNumber, password} = req.body;
-    if (password) updateData.password = await bcrypt.hash(password, 10);
-    const picture = req.file ? req.file.filename : null;
-    const user = await prisma.user.update({
-      where: { 
-        id: parseInt(id) 
-      },
-      data: {
-        fullName, 
-        email, 
-        phoneNumber,
-        picture
+      if (err) {
+        return res.status(400).json({ message: err.message });
       }
+
+      const userId = req.user.id;
+      const { name, phoneNumber } = req.body;
+      const picture = req.file ? req.file.filename : undefined;
+
+      const updatedUser = await prisma.user.update({
+        where: { id: parseInt(userId) },
+        data: {
+          name,
+          phoneNumber,
+          picture,
+        },
+      });
+
+      res.json({ message: "Profile updated successfully", user: updatedUser });
     });
-    res.json({ message: "สำเร็จ", user });
-  });
   } catch (error) {
     console.error("เกิดข้อผิดพลาด:", error);
     res.status(500).json({ error: error.message });
@@ -103,10 +130,10 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.delete({ 
-      where: { 
-        id: parseInt(id) 
-      }
+    const user = await prisma.user.delete({
+      where: {
+        id: parseInt(id),
+      },
     });
     res.json({ message: "สำเร็จ", user });
   } catch (error) {

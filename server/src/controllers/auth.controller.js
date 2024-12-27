@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "images/photo/");
+    cb(null, "public/photo/");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -45,9 +45,9 @@ exports.register = async (req, res) => {
         return res.status(400).json({ error: err.message });
       }
 
-      const { fullName, email, password } = req.body;
+      const { name, email, password } = req.body;
 
-      if (!fullName || !email || !password) {
+      if (!name || !email || !password) {
         return res.status(400).json({ message: "All fields are required" });
       }
 
@@ -61,12 +61,12 @@ exports.register = async (req, res) => {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      const hashPassword = await bcrypt.hash(password, 20);
+      const hashPassword = await bcrypt.hash(password, 10);
       const picture = req.file ? req.file.filename : null;
 
       const user = await prisma.user.create({
         data: {
-          fullName,
+          name,
           email,
           password: hashPassword,
           picture,
@@ -106,7 +106,7 @@ exports.login = async (req, res) => {
       return res.status(401).json(isMatch);
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -115,7 +115,7 @@ exports.login = async (req, res) => {
       token,
       user: {
         id: user.id,
-        fullName: user.fullName,
+        name: user.name,
         email: user.email,
       },
     });
@@ -132,7 +132,7 @@ exports.currentUser = async (req, res) => {
           select: {
               id: true,
               email: true,
-              fullNameame: true,
+              name: true,
               role: true
           }
       })
