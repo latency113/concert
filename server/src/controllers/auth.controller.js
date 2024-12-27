@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/photo/");
+    cb(null, "images/photo/");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -52,8 +52,8 @@ exports.register = async (req, res) => {
       }
 
       const existingUser = await prisma.user.findFirst({
-        where: { 
-          email 
+        where: {
+          email,
         },
       });
 
@@ -81,7 +81,6 @@ exports.register = async (req, res) => {
   }
 };
 
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -92,8 +91,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "password are required" });
     }
     const user = await prisma.user.findFirst({
-      where: { 
-        email 
+      where: {
+        email,
       },
     });
 
@@ -127,18 +126,18 @@ exports.login = async (req, res) => {
 
 exports.currentUser = async (req, res) => {
   try {
-      const user = await prisma.user.findFirst({
-          where: { email: req.user.email },
-          select: {
-              id: true,
-              email: true,
-              name: true,
-              role: true
-          }
-      })
-      res.json({ user })
+    const user = await prisma.user.findFirst({
+      where: { email: req.user.email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    res.json({ user });
   } catch (error) {
-      console.log(error)
-      res.status(500).json({ message: 'Server Error' })
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
   }
-}
+};

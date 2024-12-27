@@ -20,7 +20,7 @@ exports.authMiddleware = (req, res, next) => {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/photo/");
+    cb(null, "images/photo/");
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -66,7 +66,9 @@ exports.getProfile = async (req, res) => {
     console.log("req.user:", req.user);
 
     if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Unauthorized: User ID is missing" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User ID is missing" });
     }
 
     const userId = req.user.id;
@@ -79,25 +81,29 @@ exports.getProfile = async (req, res) => {
         email: true,
         phoneNumber: true,
         picture: true,
+        role: true,
       },
     });
 
-    const usersWithUrls ={
+    const usersWithUrls = {
       ...user,
-      pictureUrl: user.picture ? `${req.protocol}://${req.get('host')}/images/photo/${user.picture}` : null
+      pictureUrl: user.picture
+        ? `${req.protocol}://${req.get("host")}/images/photo/${user.picture}`
+        : null,
     };
 
     if (!user) {
       return res.status(404).json({ message: "User profile not found" });
     }
 
-    res.status(200).json({ message: "Profile retrieved successfully", user: usersWithUrls });
+    res
+      .status(200)
+      .json({ message: "Profile retrieved successfully", user: usersWithUrls });
   } catch (error) {
     console.error("Error retrieving profile:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 exports.updateProfile = async (req, res) => {
   try {

@@ -33,26 +33,41 @@ const upload = multer({
 });
 
 
-exports.get = async (req,res) => {
+exports.get = async (req, res) => {
   try {
-    const concert = await prisma.concert.findMany({})
-    res.status(500).json(concert)
+    const concerts = await prisma.concert.findMany();
+    const concertsWithUrls = concerts.map(concert => ({
+      ...concert,
+      pictureUrl: concert.picture 
+        ? `${req.protocol}://${req.get('host')}/images/photo/${concert.picture}` 
+        : null
+    }));
+    
+    res.status(200).json({ concerts: concertsWithUrls });
+    
   } catch (error) {
-    console.log(error)
-    res.status(500).json({message:"error"})
+    console.error("Error fetching concerts:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
+
 
 
 exports.getById = async (req,res) => {
   try {
     const {id} = req.params
-    const concert = await prisma.concert.findMany({
+    const concerts = await prisma.concert.findMany({
       where : {
         id:parseInt(id)
       }
     })
-    res.status(500).json(concert)
+    const concertsWithUrls = concerts.map(concert => ({
+      ...concert,
+      pictureUrl: concert.picture 
+        ? `${req.protocol}://${req.get('host')}/images/photo/${concert.picture}` 
+        : null
+    }));
+    res.status(200).json({concert:concertsWithUrls})
   } catch (error) {
     res.status(500).json({message:"error"})
   }
@@ -108,12 +123,12 @@ exports.updateCon = async (req, res) => {
             concertName:concertName,
             venue:venue,
             concertDate:concertDate,
-            seatsAvailable:seatsAvailable,
-            price:price,
+            seatsAvailable:parseInt(seatsAvailable),
+            price:parseInt(price),
             picture,
         },
       });
-      res.json({message: "อัพเดตคอนเสิร์ตสำเร็จ",concert,});
+      res.json({message: "อัพเดตคอนเสิร์ตสำเร็จ",concert});
     } catch (error) {
       console.error("เกิดข้อผิดพลาดระหว่างการอัพเดตคอนเสิร์ต:", error);
       res.status(500).json({ error: error.message });
