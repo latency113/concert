@@ -3,12 +3,19 @@ const prisma = new PrismaClient();
 
 exports.get = async (req, res) => {
   try {
-    const bookings = await prisma.booking.findMany();
+    const bookings = await prisma.booking.findMany({
+      include: {
+        concert: true,
+        schedule: true,
+      },
+    });
     res.json(bookings);
   } catch (error) {
-    res.status(500).json({ message: "ดึงข้อมูลสำเร็จ" });
+    console.error(error); // log error for debugging
+    res.status(500).json({ message: "เกิดข้อผิดพลาด" });
   }
 };
+
 
 exports.getById = async (req, res) => {
   try {
@@ -34,8 +41,9 @@ exports.getById = async (req, res) => {
 
 exports.createBooking = async (req, res) => {
   try {
-    const { concertId, totalTickets, userId } = req.body;
+    const { concertId, totalTickets, userId, scheduleId } = req.body;
 
+  
     const concert = await prisma.concert.findUnique({
       where: { id: parseInt(concertId) },
       include: { bookings: true },
@@ -45,11 +53,14 @@ exports.createBooking = async (req, res) => {
       return res.status(404).json({ message: "ไม่พบคอนเสิร์ต" });
     }
 
+ 
     const totalBookedTickets = concert.bookings.reduce(
       (acc, booking) => acc + booking.totalTickets,
       0
     );
-    const availableTickets = concert.price - totalBookedTickets;
+
+    
+    const availableTickets = concert.seatsAvailable - totalBookedTickets;
 
     if (availableTickets < totalTickets) {
       return res.status(400).json({
@@ -57,31 +68,36 @@ exports.createBooking = async (req, res) => {
       });
     }
 
+    
     const newBooking = await prisma.booking.create({
       data: {
         userId: parseInt(userId),
         concertId: parseInt(concertId),
+        scheduleId: parseInt(scheduleId), 
         totalTickets: totalTickets,
         totalAmount: concert.price * totalTickets,
         status: "Pending",
       },
     });
+
     await prisma.concert.update({
-      where: {
-        id: parseInt(concertId),
-      },
+      where: { id: parseInt(concertId) },
       data: {
         seatsAvailable: {
-          decrement: parseInt(totalTickets),
+          decrement: totalTickets,
         },
       },
     });
+
+    // Send response with new booking details
     res.status(201).json(newBooking);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "เกิดข้อผิดพลาด" });
   }
 };
+
+
 
 exports.updateBooking = async (req, res) => {
   try {

@@ -24,7 +24,7 @@ const productRoute = require("./routes/product.route");
 const categorieRoute = require("./routes/category.route");
 const authRoute = require("./routes/auth.route");
 const userRoute = require("./routes/user.route");
-const adminRoute = require("./routes/admin.route")
+// const adminRoute = require("./routes/admin.route")
 const concertRoute = require("./routes/concert.route")
 const bookingRoute = require("./routes/booking.route")
 const orderRoute = require("./routes/order.route")
@@ -37,7 +37,7 @@ app.use("/api",
         categorieRoute, 
         authRoute, 
         userRoute,
-        adminRoute,
+        // adminRoute,
         concertRoute,
         bookingRoute,
         orderRoute,

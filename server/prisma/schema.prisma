@@ -13,27 +13,29 @@ enum Role {
 }
 
 model Concert {
-  id             Int       @id @default(autoincrement())
-  concertName    String    @db.VarChar(100)
-  venue          String    @db.VarChar(100)
-  concertDate    DateTime?
+  id             Int        @id @default(autoincrement())
+  concertName    String     @db.VarChar(100)
+  venue          String     @db.VarChar(100)
   picture        String?
   price          Int
-  seatsAvailable Int       @default(0)
-  createdAt      DateTime  @default(now())
+  seatsAvailable Int        @default(0)
+  createdAt      DateTime   @default(now())
   bookings       Booking[]
+  Schedule       Schedule[]
 }
 
 model Booking {
   id           Int      @id @default(autoincrement())
   userId       Int
   concertId    Int
+  scheduleId   Int
   bookingDate  DateTime @default(now())
   totalTickets Int
   totalAmount  Float
   status       String   @default("Pending")
   user         User     @relation(fields: [userId], references: [id])
   concert      Concert  @relation(fields: [concertId], references: [id])
+  schedule     Schedule @relation(fields: [scheduleId], references: [id])
 }
 
 model User {
@@ -49,6 +51,16 @@ model User {
   bookings    Booking[]
   Cart        Cart[]
   Order       Order[]
+}
+
+model Schedule {
+  id        Int       @id @default(autoincrement())
+  concertId Int
+  date      DateTime
+  startTime String    @db.VarChar(10)
+  endTime   String    @db.VarChar(10)
+  concert   Concert   @relation(fields: [concertId], references: [id])
+  Booking   Booking[]
 }
 
 model Category {

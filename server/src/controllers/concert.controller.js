@@ -10,7 +10,11 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(
       null,
-      file.fieldname + "-" + uniqueSuffix + "." + file.originalname.split(".").pop()
+      file.fieldname +
+        "-" +
+        uniqueSuffix +
+        "." +
+        file.originalname.split(".").pop()
     );
   },
 });
@@ -32,161 +36,191 @@ const upload = multer({
   },
 });
 
-
+/* ----------------------------------
+  🎟️ ดึงข้อมูลคอนเสิร์ตทั้งหมด
+---------------------------------- */
 exports.get = async (req, res) => {
   try {
-    const concerts = await prisma.concert.findMany();
-    const concertsWithUrls = concerts.map(concert => ({
+    const concerts = await prisma.concert.findMany({
+      include: {
+        Schedule: true, // รวมตารางรอบเวลา
+      },
+    });
+
+    const concertsWithUrls = concerts.map((concert) => ({
       ...concert,
-      pictureUrl: concert.picture 
-        ? `${req.protocol}://${req.get('host')}/images/photo/${concert.picture}` 
-        : null
+      pictureUrl: concert.picture
+        ? `${req.protocol}://${req.get("host")}/images/photo/${concert.picture}`
+        : null,
     }));
-    
+
     res.status(200).json({ concerts: concertsWithUrls });
-    
   } catch (error) {
     console.error("Error fetching concerts:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-
-
-exports.getById = async (req,res) => {
+/* ----------------------------------
+  🎟️ ดึงข้อมูลคอนเสิร์ตตาม ID
+---------------------------------- */
+exports.getById = async (req, res) => {
   try {
-    const {id} = req.params
-    const concerts = await prisma.concert.findMany({
-      where : {
-        id:parseInt(id)
-      }
-    })
-    const concertsWithUrls = concerts.map(concert => ({
-      ...concert,
-      pictureUrl: concert.picture 
-        ? `${req.protocol}://${req.get('host')}/images/photo/${concert.picture}` 
-        : null
-    }));
-    res.status(200).json({concert:concertsWithUrls})
+    const { id } = req.params;
+    const concert = await prisma.concert.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        Schedule: true,
+      },
+    });
+
+    if (!concert) {
+      return res.status(404).json({ message: "Concert not found" });
+    }
+
+    res.status(200).json({
+      concert: {
+        ...concert,
+        pictureUrl: concert.picture
+          ? `${req.protocol}://${req.get("host")}/images/photo/${
+              concert.picture
+            }`
+          : null,
+      },
+    });
   } catch (error) {
-    res.status(500).json({message:"error"})
+    console.error("Error fetching concert by ID:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
-
+/* ----------------------------------
+  🎵 สร้างคอนเสิร์ตพร้อมรอบเวลา
+---------------------------------- */
 exports.create = async (req, res) => {
   upload.single("picture")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
 
-    const { concertName, venue, concertDate,price,seatsAvailable} = req.body;
+    const {
+      concertName,
+      venue,
+      price,
+      seatsAvailable,
+      schedules,
+    } = req.body;
     const picture = req.file ? req.file.filename : null;
 
     try {
-      const isoConcertDate = new Date(concertDate).toISOString();
       const concert = await prisma.concert.create({
         data: {
           concertName,
           venue,
-          concertDate: isoConcertDate,
           price: parseInt(price),
           seatsAvailable: parseInt(seatsAvailable),
           picture,
+          Schedule: {
+            create: schedules.map((schedule) => ({
+              date: new Date(schedule.date).toISOString(),
+              startTime: schedule.startTime,
+              endTime: schedule.endTime,
+            })),
+          },
         },
+        include: { schedules: true },
       });
-      res.json({message: "สร้างคอนเสิร์ตสำเร็จ",concert,});
+
+      res.status(201).json({ message: "สร้างคอนเสิร์ตสำเร็จ", concert });
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดระหว่างการอัปเดตคอนเสิร์ต:", error);
+      console.error("Error creating concert:", error);
       res.status(500).json({ error: error.message });
     }
   });
 };
 
-
-
+/* ----------------------------------
+  🎵 อัปเดตคอนเสิร์ตพร้อมรอบเวลา
+---------------------------------- */
 exports.updateCon = async (req, res) => {
   upload.single("picture")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
+
     const { id } = req.params;
-    const { concertName, venue, concertDate,price,seatsAvailable} = req.body;
+    const {
+      concertName,
+      venue,
+      price,
+      seatsAvailable,
+      schedules,
+    } = req.body;
     const picture = req.file ? req.file.filename : null;
 
     try {
+      // แปลง schedules เป็น Array ถ้าเป็น String
+      let parsedSchedules = [];
+      if (schedules) {
+        try {
+          parsedSchedules = JSON.parse(schedules);
+        } catch (parseError) {
+          return res
+            .status(400)
+            .json({
+              error: "Invalid schedules format. Please use a valid JSON array.",
+            });
+        }
+      }
+
+      const updateData = {};
+
+      if (concertName) updateData.concertName = concertName;
+      if (venue) updateData.venue = venue;
+      if (price) updateData.price = parseInt(price);
+      if (seatsAvailable) updateData.seatsAvailable = parseInt(seatsAvailable);
+      if (picture) updateData.picture = picture;
+
+      if (Array.isArray(parsedSchedules)) {
+        updateData.Schedule = {
+          create: parsedSchedules.map((schedule) => ({
+            date: new Date(schedule.date).toISOString(),
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+          })),
+        };
+      }
+
       const concert = await prisma.concert.update({
-        where : {
-          id: parseInt(id),
-        },
-        data: {
-            concertName:concertName,
-            venue:venue,
-            concertDate:concertDate,
-            seatsAvailable:parseInt(seatsAvailable),
-            price:parseInt(price),
-            picture,
-        },
+        where: { id: parseInt(id) },
+        data: updateData,
+        include: { Schedule: true }, // แสดงข้อมูลตารางเวลา
       });
-      res.json({message: "อัพเดตคอนเสิร์ตสำเร็จ",concert});
+
+      res.status(200).json({ message: "อัพเดตคอนเสิร์ตสำเร็จ", concert });
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดระหว่างการอัพเดตคอนเสิร์ต:", error);
+      console.error("Error updating concert:", error);
       res.status(500).json({ error: error.message });
+      
     }
   });
+  console.log('Request body:', req.body);
 };
 
-
-exports.delete = async (req,res) => {
+/* ----------------------------------
+  🗑️ ลบคอนเสิร์ต
+---------------------------------- */
+exports.delete = async (req, res) => {
   try {
-    const {id} = req.params
-    const concert = await prisma.concert.delete({
-      where : {
-        id:parseInt(id)
-      }
-    })
-    res.json({message: "ลบคอนเสิร์ตสำเร็จ",concert,});
-  } catch (error) {
-    console.error("เกิดข้อผิดพลาดระหว่างการลบคอนเสิร์ต:", error);
-    res.status(500).json({ error: error.message });
-  }
-}
-
-
-exports.getBookings = async (req, res) => {
-  try {
-    const { id } = req.params; 
-
-    const bookings = await prisma.booking.findMany({
-      where: {
-        concertId: parseInt(id),
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-          },
-        },
-        concert: {
-          select: {
-            id: true,
-            concertName: true,
-            concertDate: true,
-            venue: true,
-          },
-        },
-      },
+    const { id } = req.params;
+    await prisma.concert.delete({
+      where: { id: parseInt(id) },
     });
-
-    if (bookings.length === 0) {
-      return res.status(404).json({ message: "No bookings found for this concert." });
-    }
-
-    res.json({message: "จองคอนเสิร์ตสำเร็จ",bookings,});
+    res.json({ message: "ลบคอนเสิร์ตสำเร็จ" });
   } catch (error) {
-    console.error("เกิดข้อผิดพลาดระหว่างการจองคอนเสิร์ต:", error);
+    console.error("Error deleting concert:", error);
     res.status(500).json({ error: error.message });
   }
 };

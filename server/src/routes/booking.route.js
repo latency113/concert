@@ -2,9 +2,10 @@ const express = require('express')
 const app = express.Router()
 
 const controller = require('../controllers/booking.controller')
+const { authCheck, adminCheck } = require('../middlewares/middleware')
 
 //localhost:4000/products
-app.get('/booking', controller.get)
+app.get('/bookings', controller.get)
 app.get('/booking/user/:id', controller.getById);
 app.post('/booking', controller.createBooking)
 app.put('/booking/:id', controller.updateBooking)
