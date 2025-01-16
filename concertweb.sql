@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 31, 2024 at 10:25 AM
+-- Generation Time: Jan 16, 2025 at 01:46 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -52,7 +52,13 @@ INSERT INTO `booking` (`id`, `userId`, `concertId`, `bookingDate`, `totalTickets
 (14, 1, 2, '2024-12-31 04:22:46.541', 1, 899, 'Pending', 9),
 (15, 1, 2, '2024-12-31 04:23:07.014', 1, 899, 'Pending', 9),
 (16, 1, 2, '2024-12-31 08:41:13.776', 1, 899, 'Pending', 9),
-(17, 1, 2, '2024-12-31 09:24:42.415', 1, 899, 'Pending', 9);
+(17, 1, 2, '2024-12-31 09:24:42.415', 1, 899, 'Pending', 9),
+(18, 1, 2, '2025-01-01 15:04:53.728', 1, 899, 'Pending', 9),
+(19, 2, 2, '2025-01-01 15:37:36.003', 1, 899, 'Pending', 9),
+(20, 2, 4, '2025-01-04 15:27:40.841', 1, 120, 'Pending', 19),
+(21, 2, 4, '2025-01-04 15:33:04.645', 1, 120, 'Pending', 17),
+(22, 2, 3, '2025-01-04 15:52:07.442', 1, 600, 'Pending', 13),
+(23, 4, 6, '2025-01-04 16:55:04.775', 1, 299, 'Pending', 11);
 
 -- --------------------------------------------------------
 
@@ -105,11 +111,11 @@ CREATE TABLE `concert` (
 
 INSERT INTO `concert` (`id`, `concertName`, `venue`, `picture`, `price`, `createdAt`, `seatsAvailable`) VALUES
 (1, 'ไทยประกันชีวิต presents COCKTAIL EVER LIVE', 'สนามราชมังคลากีฬาสถาน', 'picture-1735490655471-504381397.jpg', 900, '2024-12-27 11:59:24.421', 1999),
-(2, 'คอนฐมเฟสครั้งที่ 2', 'SWT Landcamp จ.นครปฐม', 'picture-1735490711080-851608036.jpg', 899, '2024-12-27 13:03:05.922', 1993),
-(3, 'โฟล์คข้างวัด 5', 'พรพนาค้าไม้ อ.บางบาล จ.พระนครศรีอยุธยา', 'picture-1735304722882-368922501.jpg', 600, '2024-12-27 13:05:22.889', 1999),
-(4, 'CENTRAL AYUTTHAYA COUNTDOWN 2025', 'ณ ลานกิจกรรมหน้าศูนย์การค้าเซ็นทรัล อยุธยา', 'picture-1735307561446-483803269.jpg', 120, '2024-12-27 13:52:41.453', 999),
+(2, 'คอนฐมเฟสครั้งที่ 2', 'SWT Landcamp จ.นครปฐม', 'picture-1735490711080-851608036.jpg', 899, '2024-12-27 13:03:05.922', 1991),
+(3, 'โฟล์คข้างวัด 5', 'พรพนาค้าไม้ อ.บางบาล จ.พระนครศรีอยุธยา', 'picture-1735304722882-368922501.jpg', 600, '2024-12-27 13:05:22.889', 1998),
+(4, 'CENTRAL AYUTTHAYA COUNTDOWN 2025', 'ณ ลานกิจกรรมหน้าศูนย์การค้าเซ็นทรัล อยุธยา', 'picture-1735307561446-483803269.jpg', 120, '2024-12-27 13:52:41.453', 997),
 (5, 'Spectacle Concert', 'Phenix Grand Ballroom ชั้น 5 ฟีนิกซ์ ประตูน้ำ', 'picture-1735309019949-772658988.jpg', 1200, '2024-12-27 14:16:59.954', 1500),
-(6, 'Rangsit Camp3', 'รังสิตเฟส', 'picture-1735315194954-517695709.jpg', 299, '2024-12-27 15:59:54.957', 1000);
+(6, 'Rangsit Camp3', 'รังสิตเฟส', 'picture-1735315194954-517695709.jpg', 299, '2024-12-27 15:59:54.957', 999);
 
 -- --------------------------------------------------------
 
@@ -210,7 +216,7 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `name`, `email`, `password`, `phoneNumber`, `picture`, `enabled`, `role`, `createdAt`) VALUES
 (1, 'adminnaja', 'test001@gmail.com', '$2a$10$ZvU3cMz9PK1prbBzCZhX3uEiLdpDfmmSbLgYrpG9BHNRUyfSAdlzq', '0989029999', 'picture-1735314943577-151118400.jpg', 1, 'admin', '2024-12-27 11:54:45.957'),
-(2, 'test', 'test002@gmail.com', '$2a$10$nMvWmMKspGYDSjtc0Qg/3eG9FB56XDFFJQuFcAuPV6.nRS2Kd8Tg6', '0009099900', 'picture-1735304955665-839601558.jpg', 1, 'user', '2024-12-27 13:09:15.775'),
+(2, 'test', 'test002@gmail.com', '$2a$10$nMvWmMKspGYDSjtc0Qg/3eG9FB56XDFFJQuFcAuPV6.nRS2Kd8Tg6', '0009099900', 'picture-1736008493397-940849047.jpg', 1, 'user', '2024-12-27 13:09:15.775'),
 (4, 'test2', 'test003@gmail.com', '$2a$10$5Lcoe0ZOMsDGfU1FtZ4kZ.Fg/pIJ/ZemJjhzTRa/ZpjtVzYfO2A/K', NULL, NULL, 1, 'user', '2024-12-27 15:47:50.424');
 
 -- --------------------------------------------------------
@@ -331,7 +337,7 @@ ALTER TABLE `_prisma_migrations`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `cart`

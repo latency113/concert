@@ -84,16 +84,12 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email) {
-      return res.status(400).json({ message: "email are required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
-    if (!password) {
-      return res.status(400).json({ message: "password are required" });
-    }
+
     const user = await prisma.user.findFirst({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (!user) {
@@ -102,12 +98,15 @@ exports.login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json(isMatch);
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // สร้าง Token พร้อม id, email, role
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({
       message: "Login successful",
@@ -124,10 +123,12 @@ exports.login = async (req, res) => {
   }
 };
 
+
+
 exports.currentUser = async (req, res) => {
   try {
-    const user = await prisma.user.findFirst({
-      where: { email: req.user.email },
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
       select: {
         id: true,
         email: true,
@@ -135,9 +136,15 @@ exports.currentUser = async (req, res) => {
         role: true,
       },
     });
-    res.json({ user });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching current user:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+

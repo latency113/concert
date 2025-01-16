@@ -7,7 +7,7 @@ const { authCheck, adminCheck } = require('../middlewares/middleware')
 //localhost:4000/products
 app.get('/bookings', controller.get)
 app.get('/booking/user/:id', controller.getById);
-app.post('/booking', controller.createBooking)
+app.post('/booking',authCheck, controller.createBooking)
 app.put('/booking/:id', controller.updateBooking)
 app.delete('/booking/:id', controller.deleteBooking)
 
