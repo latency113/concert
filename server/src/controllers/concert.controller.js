@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { query } = require("express");
 const prisma = new PrismaClient();
 const multer = require("multer");
 
@@ -35,6 +36,40 @@ const upload = multer({
     }
   },
 });
+
+
+/* ----------------------------------
+  🎟️ ดึงข้อมูลคอนเสิร์ตจากการค้นหา
+---------------------------------- */
+exports.getQuery = async (req, res) => {
+  try {
+    const { query} = req.query;
+    const concerts = await prisma.concert.findMany({
+      where:{
+        concertName:{
+          contains:query
+        }
+      },
+      include: {
+        Schedule: true, // รวมตารางรอบเวลา
+      },
+    });
+
+    const concertsWithUrls = concerts.map((concert) => ({
+      ...concert,
+      pictureUrl: concert.picture
+        ? `${req.protocol}://${req.get("host")}/images/photo/${concert.picture}`
+        : null,
+    }));
+
+    res.status(200).json({ concerts: concertsWithUrls });
+  } catch (error) {
+    console.error("Error fetching concerts:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
 
 /* ----------------------------------
   🎟️ ดึงข้อมูลคอนเสิร์ตทั้งหมด

@@ -6,6 +6,7 @@ const { authCheck, adminCheck } = require('../middlewares/middleware')
 
 //localhost:4000/products
 app.get('/concerts', controller.get)
+app.get('/concerts/query', controller.getQuery)
 app.get('/concert/:id', controller.getById)
 app.post('/concerts', adminCheck,controller.create)
 app.put('/concert/:id', adminCheck,controller.updateCon)
