@@ -37,18 +37,17 @@ const upload = multer({
   },
 });
 
-
 /* ----------------------------------
   🎟️ ดึงข้อมูลคอนเสิร์ตจากการค้นหา
 ---------------------------------- */
 exports.getQuery = async (req, res) => {
   try {
-    const { query} = req.query;
+    const { query } = req.query;
     const concerts = await prisma.concert.findMany({
-      where:{
-        concertName:{
-          contains:query
-        }
+      where: {
+        concertName: {
+          contains: query,
+        },
       },
       include: {
         Schedule: true, // รวมตารางรอบเวลา
@@ -68,8 +67,6 @@ exports.getQuery = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-
 
 /* ----------------------------------
   🎟️ ดึงข้อมูลคอนเสิร์ตทั้งหมด
@@ -140,14 +137,22 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
 
-    const {
-      concertName,
-      venue,
-      price,
-      seatsAvailable,
-      schedules,
-    } = req.body;
+    const { concertName, venue, price, seatsAvailable } = req.body;
     const picture = req.file ? req.file.filename : null;
+
+    let schedules = []; // Initialize schedules as an empty array
+
+    // 1. Parse schedules JSON string (if it exists)
+    if (req.body.schedules) {
+      try {
+        schedules = JSON.parse(req.body.schedules);
+        if (!Array.isArray(schedules)) {
+          throw new Error("Invalid schedules format. Must be an array.");
+        }
+      } catch (parseError) {
+        return res.status(400).json({ error: "Invalid schedules format" });
+      }
+    }
 
     try {
       const concert = await prisma.concert.create({
@@ -158,14 +163,18 @@ exports.create = async (req, res) => {
           seatsAvailable: parseInt(seatsAvailable),
           picture,
           Schedule: {
-            create: schedules.map((schedule) => ({
-              date: new Date(schedule.date).toISOString(),
-              startTime: schedule.startTime,
-              endTime: schedule.endTime,
-            })),
+            // Correct Prisma syntax for createMany
+            createMany: {
+              data: schedules.map((schedule) => ({
+                // Now schedules is guaranteed to be an array
+                date: new Date(schedule.date).toISOString(),
+                startTime: schedule.startTime,
+                endTime: schedule.endTime,
+              })),
+            },
           },
         },
-        include: { schedules: true },
+        include: { Schedule: true }, // Include schedules in the response
       });
 
       res.status(201).json({ message: "สร้างคอนเสิร์ตสำเร็จ", concert });
@@ -186,13 +195,7 @@ exports.updateCon = async (req, res) => {
     }
 
     const { id } = req.params;
-    const {
-      concertName,
-      venue,
-      price,
-      seatsAvailable,
-      schedules,
-    } = req.body;
+    const { concertName, venue, price, seatsAvailable, schedules } = req.body;
     const picture = req.file ? req.file.filename : null;
 
     try {
@@ -202,11 +205,9 @@ exports.updateCon = async (req, res) => {
         try {
           parsedSchedules = JSON.parse(schedules);
         } catch (parseError) {
-          return res
-            .status(400)
-            .json({
-              error: "Invalid schedules format. Please use a valid JSON array.",
-            });
+          return res.status(400).json({
+            error: "Invalid schedules format. Please use a valid JSON array.",
+          });
         }
       }
 
@@ -238,10 +239,9 @@ exports.updateCon = async (req, res) => {
     } catch (error) {
       console.error("Error updating concert:", error);
       res.status(500).json({ error: error.message });
-      
     }
   });
-  console.log('Request body:', req.body);
+  console.log("Request body:", req.body);
 };
 
 /* ----------------------------------

@@ -8,8 +8,8 @@ const { authCheck, adminCheck } = require('../middlewares/middleware')
 app.get('/concerts', controller.get)
 app.get('/concerts/query', controller.getQuery)
 app.get('/concert/:id', controller.getById)
-app.post('/concerts', adminCheck,controller.create)
-app.put('/concert/:id', adminCheck,controller.updateCon)
-app.delete('/concert/:id', adminCheck,controller.delete)
+app.post('/concerts', authCheck,adminCheck,controller.create)
+app.put('/concert/:id', authCheck,adminCheck,controller.updateCon)
+app.delete('/concert/:id', authCheck,adminCheck,controller.delete)
 
 module.exports = app
