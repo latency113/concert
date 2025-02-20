@@ -8,7 +8,7 @@ app.get("/user/profile", authCheck,controller.getProfile);
 app.put("/user/:id", authCheck,controller.updateProfile);
 app.delete("/user/:id", controller.deleteUser);
 app.put("/change-status", controller.changeUserStatus);
-app.put("/change-role", controller.changeUserRole);
+app.put("/change-role/:id", controller.changeUserRole);
 app.post("/user/cart", controller.addToCart);
 app.get("/user/cart", controller.getCart);
 app.delete("/user/cart", controller.clearCart);

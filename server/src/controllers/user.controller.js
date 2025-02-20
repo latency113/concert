@@ -164,7 +164,8 @@ exports.changeUserStatus = async (req, res) => {
 
 exports.changeUserRole = async (req, res) => {
   try {
-    const { id, role } = req.body;
+    const { id } = req.params;
+    const { role } = req.body;
     if (!["user", "admin"].includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
     }
