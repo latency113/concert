@@ -44,7 +44,7 @@ exports.createBooking = async (req, res) => {
 
     // Ensure scheduleId is valid
     const schedule = await prisma.schedule.findUnique({
-      where: { id: parseInt(scheduleId) },
+      where: { id: scheduleId },
     });
 
     if (!schedule) {
