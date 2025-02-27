@@ -46,7 +46,7 @@ exports.Checkout = async (req, res) => {
         },
       ],
       mode: "payment",
-      return_url: `http://localhost:5173/user/complete/{CHECKOUT_SESSION_ID}`,
+      return_url: `https://conhub-iokd.onrender.com/user/complete/{CHECKOUT_SESSION_ID}`,
     });
 
     console.log("Session created successfully: ", session); // เพิ่มการ log ดู session ที่ถูกสร้างขึ้น
