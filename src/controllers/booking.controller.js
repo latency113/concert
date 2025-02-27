@@ -6,7 +6,7 @@ exports.get = async (req, res) => {
     const bookings = await prisma.booking.findMany({
       include: {
         concert: true,
-        schedule: true,
+        Schedule: true,
       },
     });
     res.json(bookings);
