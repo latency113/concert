@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { ObjectId } = require("mongodb"); // Import ObjectId
 const { query } = require("express");
 const prisma = new PrismaClient();
 const multer = require("multer");
@@ -193,7 +194,8 @@ exports.updateCon = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { concertName, venue, price, seatsAvailable, schedules, brandId } = req.body;
+    const { concertName, venue, price, seatsAvailable, schedules, brandId } =
+      req.body;
     const picture = req.file ? req.file.filename : null;
 
     let parsedSchedules = [];
@@ -212,9 +214,11 @@ exports.updateCon = async (req, res) => {
     if (concertName) updateData.concertName = concertName;
     if (venue) updateData.venue = venue;
     if (price) updateData.price = parseInt(price);
-    if (brandId) updateData.brandId = brandId;
+    if (brandId && ObjectId.isValid(brandId)) {
+      updateData.brandId = new ObjectId(brandId);
+  }
     if (seatsAvailable) updateData.seatsAvailable = parseInt(seatsAvailable);
-    if (picture) updateData.picture = picture; // อัปเดตรูปภาพ
+    if (picture) updateData.picture = picture;
 
     if (Array.isArray(parsedSchedules)) {
       updateData.Schedule = {
@@ -228,7 +232,9 @@ exports.updateCon = async (req, res) => {
 
     try {
       const concert = await prisma.concert.update({
-        where: { id: id },
+        where: {
+          id: id,
+        },
         data: updateData,
         include: { Schedule: true },
       });
@@ -240,7 +246,6 @@ exports.updateCon = async (req, res) => {
     }
   });
 };
-
 
 /* ----------------------------------
   🗑️ ลบคอนเสิร์ต
