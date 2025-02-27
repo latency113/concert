@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Status {
+  Paid
+  NotPaying
+  Cancel
+}
+
+model Concert {
+  id             Int        @id @default(autoincrement())
+  concertName    String     @db.VarChar(100)
+  venue          String     @db.VarChar(100)
+  brandId        Int?
+  picture        String?
+  price          Int
+  seatsAvailable Int        @default(0)
+  createdAt      DateTime   @default(now())
+  brand          Brand?     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  bookings       Booking[]
+  Schedule       Schedule[]
+}
+
+model Booking {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  concertId    Int
+  scheduleId   Int
+  bookingDate  DateTime @default(now())
+  totalTickets Int
+  totalAmount  Float
+  status       Status   @default(NotPaying)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  concert      Concert  @relation(fields: [concertId], references: [id], onDelete: Cascade)
+  schedule     Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  email       String    @unique @db.VarChar(20)
+  password    String    @db.VarChar(100)
+  phoneNumber String?   @db.VarChar(10)
+  picture     String?
+  enabled     Boolean   @default(true)
+  role        Role      @default(user)
+  createdAt   DateTime  @default(now())
+  bookings    Booking[]
+  // Cart        Cart[]
+  // Order       Order[]
+}
+
+model Schedule {
+  id        Int       @id @default(autoincrement())
+  concertId Int
+  date      DateTime
+  startTime String    @db.VarChar(10)
+  endTime   String    @db.VarChar(10)
+  concert   Concert   @relation(fields: [concertId], references: [id], onDelete: Cascade)
+  Booking   Booking[]
+}
+
+model Brand {
+  id      Int       @id @default(autoincrement())
+  name    String    @db.VarChar(50)
+  Concert Concert[]
+}
+
+// model Category {
+//   id          Int       @id @default(autoincrement())
+//   name        String    @unique @db.VarChar(50)
+//   description String?
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @updatedAt
+//   products    Product[]
+// }
+
+// model Product {
+//   id          Int         @id @default(autoincrement())
+//   name        String      @db.VarChar(100)
+//   description String?
+//   price       Int
+//   stock       Int         @default(0)
+//   categoryId  Int
+//   createdAt   DateTime    @default(now())
+//   updatedAt   DateTime    @updatedAt
+//   image       String?
+//   category    Category    @relation(fields: [categoryId], references: [id])
+//   cartItems   Cart[]
+//   orderItems  OrderItem[]
+// }
+
+// model Cart {
+//   id        Int      @id @default(autoincrement())
+//   userId    Int
+//   productId Int
+//   quantity  Int      @default(1)
+//   price     Float
+//   createdAt DateTime @default(now())
+//   product   Product  @relation(fields: [productId], references: [id])
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
+
+// model Order {
+//   id        Int         @id @default(autoincrement())
+//   userId    Int
+//   status    String      @default("Pending")
+//   createdAt DateTime    @default(now())
+//   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   items     OrderItem[]
+// }
+
+// model OrderItem {
+//   id        Int     @id @default(autoincrement())
+//   orderId   Int
+//   productId Int
+//   quantity  Int     @default(1)
+//   order     Order   @relation(fields: [orderId], references: [id])
+//   product   Product @relation(fields: [productId], references: [id])
+// }
