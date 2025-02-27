@@ -163,7 +163,7 @@ exports.create = async (req, res) => {
           price: parseInt(price),
           seatsAvailable: parseInt(seatsAvailable),
           picture,
-          brandId: brandId,
+          brandId: brandId ? brandId : null,
           Schedule: {
             createMany: {
               data: schedules.map((schedule) => ({
