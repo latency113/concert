@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -19,10 +19,10 @@ enum Status {
 }
 
 model Concert {
-  id             Int        @id @default(autoincrement())
-  concertName    String     @db.VarChar(100)
-  venue          String     @db.VarChar(100)
-  brandId        Int?
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  concertName    String
+  venue          String
+  brandId        String?    @db.ObjectId
   picture        String?
   price          Int
   seatsAvailable Int        @default(0)
@@ -33,26 +33,26 @@ model Concert {
 }
 
 model Booking {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  concertId    Int
-  scheduleId   Int
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  concertId    String   @db.ObjectId
+  scheduleId   String   @db.ObjectId
   bookingDate  DateTime @default(now())
   totalTickets Int
   totalAmount  Float
   status       Status   @default(NotPaying)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   concert      Concert  @relation(fields: [concertId], references: [id], onDelete: Cascade)
-  schedule     Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  Schedule     Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(50)
-  email       String    @unique @db.VarChar(20)
-  password    String    @db.VarChar(100)
-  phoneNumber String?   @db.VarChar(10)
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String    @unique
+  password    String
   picture     String?
+  phoneNumber String?
   enabled     Boolean   @default(true)
   role        Role      @default(user)
   createdAt   DateTime  @default(now())
@@ -62,19 +62,19 @@ model User {
 }
 
 model Schedule {
-  id        Int       @id @default(autoincrement())
-  concertId Int
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  concertId String    @db.ObjectId
   date      DateTime
-  startTime String    @db.VarChar(10)
-  endTime   String    @db.VarChar(10)
+  startTime String
+  endTime   String
   concert   Concert   @relation(fields: [concertId], references: [id], onDelete: Cascade)
   Booking   Booking[]
 }
 
 model Brand {
-  id      Int       @id @default(autoincrement())
-  name    String    @db.VarChar(50)
-  Concert Concert[]
+  id      String    @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  concert Concert[]
 }
 
 // model Category {

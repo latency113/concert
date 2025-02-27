@@ -5,7 +5,7 @@ exports.get = async (req, res) => {
   try {
     const brand = await prisma.brand.findMany({
       include: {
-        Concert: true,
+        concert: true,
       },
     });
 
@@ -24,7 +24,7 @@ exports.getById = async (req, res) => {
         id: parseInt(id),
       },
       include: {
-        Concert: true,
+        concert: true,
       },
     });
 

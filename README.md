@@ -20,15 +20,6 @@
 | `/api/concert/:id`                  | DELETE | Delete concert by ID       | None                                                                                  |
 | `/api/concert/:id/bookings`         | GET    | Get bookings for concert   | None                                                                                  |
 
-## Category Clear
-
-| Endpoint                            | Method | Description            | Body                        |
-|-------------------------------------|--------|------------------------|-----------------------------|
-| `/api/category`                     | POST   | Create category         | `{ "name": "Test1", "description": "Sample description" }` |
-| `/api/category`                     | GET    | Get all categories      | None                        |
-| `/api/category/:id`                 | GET    | Get category by ID      | None                        |
-| `/api/category/:id`                 | PUT    | Update category by ID   | `{ "name": "Updated Name", "description": "Updated description" }` |
-| `/api/category/:id`                 | DELETE | Delete category by ID   | None                        |
 
 
 ## Booking Management
@@ -41,35 +32,6 @@
 | `/api/booking/:id`                 | PUT    | Update booking by ID    | `{ "status": "Confirmed" }` |
 | `/api/booking/:id`                 | DELETE | Delete booking by ID    | None                        |
 
-## Product Clear
-
-| Endpoint                            | Method | Description            | Body                                                                                  |
-|-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
-| `/api/product`                      | POST   | Create product          | `{ "title": "TEST", "description": "test", "price": 10000, "stock": 20, "categoryId": 2, "images": [] }` |
-| `/api/product/:id`                  | GET    | Get product by ID       | None                                                                                  |
-| `/api/product/:id`                  | PUT    | Update product by ID    | `{ "title": "Updated", "description": "Updated", "price": 12000, "stock": 15, "categoryId": 1, "images": []` |
-| `/api/product/:id`                  | DELETE | Delete product by ID    | None                                                                                  |
-| `/api/productby`                    | POST   | Get products by filters | `{ "sort": "price", "order": "asc", "limit": 2 }` or `{ "sort": "stock", "order": "desc", "limit": 2 }` |
-| `/api/search/filters`               | POST   | Search with filters     | `{ "query": "polycat" }`, `{ "price": [500, 1000] }`, or `{ "category": [1, 2] }`        |
-
-## Cart Management Clear
-
-| Endpoint                            | Method | Description            | Body                                                                                  |
-|-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
-| `/api/cart`                         | POST   | Create cart            | `{ "userId": 1, "productId": 2, "price": 10000,`                                      |
-| `/api/cart`                         | GET    | Get product by ID      | None                                                                                  |
-| `/api/cart/:id`                     | DELETE | Update product by ID   | None                                                                                  |
-| `/api/cart/:id`                     | DELETE | Delete product by ID   | None                                                                                  |
-
-## Order Management Clear
-
-| Endpoint                            | Method | Description            | Body                                                                                  |
-|-------------------------------------|--------|------------------------|---------------------------------------------------------------------------------------|
-| `/api/order`                         | POST   | Create order          | `{ "userId": 1, "productId": 2, "price": 10000,`                                      |
-| `/api/order`                         | GET    | Get All order         | None                                                                                  |
-| `/api/order/:id`                     | GET    | Get order by ID       | None                                                                                  |
-| `/api/order/:id`                     | PUT    | Update order by ID    | None                                                                                  |
-| `/api/order/:id`                     | DELETE | Delete order by ID    | None                                                                                  |
 
 ## User Management Clear
 
@@ -87,11 +49,4 @@
 | `/api/user/order`                   | POST   | Place an order            | `{ "items": [{ "productId": 1, "quantity": 2 }] }`         |
 | `/api/user/order`                   | GET    | Get user orders           | None                                                       |
 
-## Admin
-
-| Endpoint                            | Method | Description               | Body                              |
-|-------------------------------------|--------|---------------------------|-----------------------------------|
-| `/api/user/order`                   | PUT    | Update order status        | `{ "orderId": 35, "orderStatus": "Completed" }` |
-| `/api/admin/orders`                 | GET    | Get all orders             | None                              |
-| `/api/admin/user-stats`             | GET    | Get user statistics        | None                              |
 
