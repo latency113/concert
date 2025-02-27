@@ -21,7 +21,7 @@ exports.getById = async (req, res) => {
     const { id } = req.params;
     const brand = await prisma.brand.findUnique({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       include: {
         concert: true,
@@ -76,7 +76,7 @@ exports.delete = async (req, res) => {
     const { id } = req.params;
     const brand = await prisma.brand.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
 

@@ -123,7 +123,7 @@ exports.updateProfile = async (req, res) => {
       }
 
       const updatedUser = await prisma.user.update({
-        where: { id: parseInt(userId) },
+        where: { id: userId },
         data: {
           name,
           phoneNumber,
@@ -146,7 +146,7 @@ exports.deleteUser = async (req, res) => {
     const { id } = req.params;
     const user = await prisma.user.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
     res.json({ message: "สำเร็จ", user });
@@ -160,7 +160,7 @@ exports.changeUserStatus = async (req, res) => {
   try {
     const { id, enabled } = req.body;
     const user = await prisma.user.update({
-      where: { id: parseInt(id) },
+      where: { id: id },
       data: { enabled },
     });
     res.json({ message: "สำเร็จ", user });
@@ -178,7 +178,7 @@ exports.changeUserRole = async (req, res) => {
       return res.status(400).json({ message: "Invalid role" });
     }
     const user = await prisma.user.update({
-      where: { id: parseInt(id) },
+      where: { id: id },
       data: { role },
     });
     res.json({ message: "สำเร็จ", user });

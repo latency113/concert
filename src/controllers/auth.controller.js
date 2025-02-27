@@ -51,7 +51,7 @@ exports.register = async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
       }
 
-      const existingUser = await prisma.user.findFirst({
+      const existingUser = await prisma.user.findUnique({
         where: {
           email,
         },
@@ -86,7 +86,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 

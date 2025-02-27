@@ -7,7 +7,7 @@ exports.Checkout = async (req, res) => {
     const { id } = req.body;
     const booking = await prisma.booking.findUnique({
       where: {
-        id: Number(id),
+        id: id,
       },
       include: {
         concert: {
@@ -70,7 +70,7 @@ exports.CheckoutStatus = async (req, res) => {
     console.log(payment);
     const result = await prisma.booking.update({
       where: {
-        id: Number(bookingId),
+        id: bookingId,
       },
       data: {
         status: "Paid",

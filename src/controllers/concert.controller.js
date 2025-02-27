@@ -101,7 +101,7 @@ exports.getById = async (req, res) => {
     const { id } = req.params;
     const concert = await prisma.concert.findUnique({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       include: {
         Schedule: true,
@@ -163,7 +163,7 @@ exports.create = async (req, res) => {
           price: parseInt(price),
           seatsAvailable: parseInt(seatsAvailable),
           picture,
-          brandId: parseInt(brandId),
+          brandId: brandId,
           Schedule: {
             createMany: {
               data: schedules.map((schedule) => ({
@@ -212,7 +212,7 @@ exports.updateCon = async (req, res) => {
     if (concertName) updateData.concertName = concertName;
     if (venue) updateData.venue = venue;
     if (price) updateData.price = parseInt(price);
-    if (brandId) updateData.brandId = parseInt(brandId);
+    if (brandId) updateData.brandId = brandId;
     if (seatsAvailable) updateData.seatsAvailable = parseInt(seatsAvailable);
     if (picture) updateData.picture = picture; // อัปเดตรูปภาพ
 
@@ -228,7 +228,7 @@ exports.updateCon = async (req, res) => {
 
     try {
       const concert = await prisma.concert.update({
-        where: { id: parseInt(id) },
+        where: { id: id },
         data: updateData,
         include: { Schedule: true },
       });
@@ -249,7 +249,7 @@ exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
     await prisma.concert.delete({
-      where: { id: parseInt(id) },
+      where: { id: id },
     });
     res.json({ message: "ลบคอนเสิร์ตสำเร็จ" });
   } catch (error) {

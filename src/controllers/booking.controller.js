@@ -21,7 +21,7 @@ exports.getById = async (req, res) => {
     const { id } = req.params;
     const booking = await prisma.user.findUnique({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       include: {
         bookings: true,
@@ -52,7 +52,7 @@ exports.createBooking = async (req, res) => {
     }
 
     const concert = await prisma.concert.findUnique({
-      where: { id: parseInt(concertId) },
+      where: { id: concertId },
       include: { bookings: true },
     });
 
@@ -76,19 +76,19 @@ exports.createBooking = async (req, res) => {
     const newBooking = await prisma.booking.create({
       data: {
         userId: req.user.id,
-        concertId: parseInt(concertId),
-        scheduleId: parseInt(scheduleId),
-        totalTickets:parseInt(totalTickets),
+        concertId: concertId,
+        scheduleId: scheduleId,
+        totalTickets: totalTickets,
         totalAmount: concert.price * totalTickets,
         status: "NotPaying",
       },
     });
 
     await prisma.concert.update({
-      where: { id: parseInt(concertId) },
+      where: { id: concertId },
       data: {
         seatsAvailable: {
-          decrement: parseInt(totalTickets),
+          decrement: totalTickets,
         },
       },
     });
@@ -111,7 +111,7 @@ exports.updateBooking = async (req, res) => {
 
     const booking = await prisma.booking.update({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       data: {
         status,
@@ -131,7 +131,7 @@ exports.deleteBooking = async (req, res) => {
 
     const booking = await prisma.booking.findUnique({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
 
@@ -144,17 +144,17 @@ exports.deleteBooking = async (req, res) => {
 
     await prisma.booking.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     });
 
     await prisma.concert.update({
       where: {
-        id: parseInt(concertId),
+        id: concertId,
       },
       data: {
         seatsAvailable: {
-           increment: parseInt(totalTickets),
+          increment: totalTickets,
         },
       },
     });
